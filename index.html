@@ -121,7 +121,7 @@
                                        :disabled="scenario === '1'"
                                        :class="scenario === '1' ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-slate-50 text-emerald-600 border-slate-200 focus:ring-emerald-500'"
                                        class="w-full border rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2" 
-                                       placeholder="200.000.000">
+                                       placeholder="100.000.000">
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <span :class="scenario === '1' ? 'text-slate-400' : 'text-emerald-500'" class="font-bold text-xs">VND</span>
                                 </div>
@@ -145,13 +145,12 @@
 
                 <!-- Card 2: PHẦN GỘP - Biểu đồ & Tỉ lệ Đóng góp cống hiến -->
                 <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
-                    <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center justify-between mb-4">
                         <h2 class="text-xs font-bold text-slate-900 flex items-center gap-2">
                             <i class="fa-solid fa-users text-chula-pink"></i>
-                            Tỉ lệ đóng góp cống hiến bài viết
+                            Tỉ lệ đóng góp & Lưu ý cơ chế
                         </h2>
                     </div>
-                    <p class="text-[10px] text-slate-400 mb-4">Các tỉ lệ cống hiến viết bài của các thành viên được quy đổi cố định</p>
                     
                     <!-- Grid hiển thị ghép đôi: Trái là Pie, Phải là danh sách tên -->
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
@@ -191,6 +190,20 @@
                                 <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">18.5%</span>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- PHẦN LƯU Ý ĐƯỢC GỘP CHUNG VÀO ĐÂY -->
+                    <div class="pt-4 mt-5 border-t border-slate-100">
+                        <h4 class="text-slate-800 font-bold text-[11px] mb-2.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-clipboard-check text-slate-400"></i>
+                            Các lưu ý cần nắm:
+                        </h4>
+                        <ul class="text-[10px] text-slate-500 space-y-2 list-disc pl-4 marker:text-slate-300">
+                            <li><strong>Phí Setup (20%):</strong> Công sức Vy Đặng lên ý tưởng ban đầu, đọc tài liệu lập kết cấu, sử dụng uy tín cá nhân ngoại giao liên kết với Giáo sư và chịu trách nhiệm cao nhất về pháp lý khoa học với trường Chula.</li>
+                            <li><strong>Trích thưởng nguồn ngoài (TH 2.2):</strong> Khi thành viên nào mang được quỹ hỗ trợ thưởng từ trường họ về đóng góp quỹ chung, họ xứng đáng nhận riêng 30% để bù đắp nỗ lực làm thủ tục.</li>
+                            <li><strong>Không có doanh thu:</strong> Nếu không xin được quỹ, các thành viên cam kết <strong>tự gánh chi phí xuất bản âm (100% tự bỏ tiền túi)</strong> dựa trên đúng tỉ lệ cống hiến viết bài.</li>
+                            <li><strong>Chi phí APC:</strong> Luôn luôn được ưu tiên hoàn trả hoặc thanh toán trước để đảm bảo tính an toàn tài chính cho toàn nhóm.</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -392,27 +405,16 @@
 
         </div>
 
-        <!-- FOOTER & EXPLANATION OF CONCEPTS -->
-        <footer class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 mt-8">
-            <h4 class="text-slate-900 font-bold text-sm mb-3">Lưu ý:</h4>
-            <ul class="text-[11px] text-slate-500 space-y-2 list-disc pl-5">
-                <li><strong>Phí Setup (20%):</strong> Công sức Vy Đặng lên ý tưởng ban đầu, đọc tài liệu lập kết cấu, sử dụng uy tín cá nhân ngoại giao liên kết với Giáo sư và chịu trách nhiệm cao nhất về pháp lý khoa học với trường Chula.</li>
-                <li><strong>Trích thưởng nguồn ngoài (Trường hợp 2.2):</strong> Khi thành viên nào mang được quỹ hỗ trợ thưởng từ chính trường họ về đóng góp cho quỹ chung, họ xứng đáng nhận riêng 30% để bù đắp nỗ lực làm thủ tục hành chính tại đơn vị của họ.</li>
-                <li><strong>Trường hợp không có doanh thu:</strong> Nếu không xin được hỗ trợ và không có thưởng thưởng dự kiến, các thành viên cam kết sẽ <strong>tự gánh chi phí xuất bản âm (100% chi phí tự bỏ tiền túi)</strong> dựa trên đúng tỉ lệ cống hiến viết bài.</li>
-                <li><strong>Chi phí APC:</strong> Luôn luôn được ưu tiên hoàn trả hoặc thanh toán trước để đảm bảo tính an toàn tài chính cho toàn nhóm.</li>
-            </ul>
-        </footer>
-
         <!-- WORKLOAD BREAKDOWN SECTION (Interactive Table reconstruction from Workload.jpg) -->
         <section class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 mt-8 overflow-hidden">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-2">
                 <h4 class="text-slate-900 font-bold text-sm flex items-center gap-2">
                     <i class="fa-solid fa-table-list text-chula-pink"></i>
                     Bảng Phân Rã Khối Lượng Công Việc Thực Tế (Workload Breakdown)
                 </h4>
             </div>
-            <p class="text-[11px] text-slate-500 mb-2">
-                Dưới đây là bảng phân rã chi tiết toàn bộ các đầu việc trải dài qua 6 giai đoạn (Phase) nghiên cứu. Bảng này hiển thị trực quan và sắc nét 100% thông tin gốc từ tài liệu gốc, tạo nền tảng khoa học vững chắc lý giải cho tỷ lệ cống hiến <strong>46% - 35.5% - 18.5%</strong> của nhóm:
+            <p class="text-[11px] text-slate-500 mb-4">
+                Chi tiết các đầu việc qua 6 giai đoạn (Phases) nghiên cứu, làm cơ sở khoa học xác định tỷ lệ cống hiến: <strong>46% - 35.5% - 18.5%</strong>.
             </p>
             
             <!-- Thêm class custom-scrollbar vào wrapper -->
@@ -832,7 +834,7 @@
                 return {
                     scenario: '2.1', // Default scenario
                     apcCost: 30000000, // Chi phí xuất bản mặc định 30tr
-                    revenue: 200000000, // Doanh thu mặc định 200tr
+                    revenue: 100000000, // Doanh thu mặc định 100tr
                     externalRecipient: '', // Default to blank / empty as requested
                     
                     // Fixed percentages as requested
@@ -1006,7 +1008,7 @@
                     if (newVal === '1') {
                         this.revenue = 0;
                     } else if (this.revenue === 0) {
-                        this.revenue = 200000000;
+                        this.revenue = 100000000;
                     }
                     this.externalRecipient = '';
                 }
