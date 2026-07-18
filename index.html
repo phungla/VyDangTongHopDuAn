@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Phân bổ Tài chính Nghiên cứu - ESML Chula</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vue.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <!-- Chart.js CDN for visual representations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chula: {
+                            pink: '#E31C79',
+                            dark: '#8B104E',
+                            light: '#FFF0F6'
+                        },
+                        academic: {
+                            navy: '#0F172A',
+                            gold: '#D97706',
+                            slate: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+    <div id="app" class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- HEADER -->
+        <header class="bg-white rounded-2xl shadow-sm p-6 mb-8 border-l-8 border-chula-pink flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <span class="bg-chula-light text-chula-pink font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">
+                    Chulalongkorn University — ESML
+                </span>
+                <h1 class="text-xl md:text-3xl font-black text-slate-900 mt-1.5">Bảng Phân Bổ Tài Chính Hợp Tác Nghiên Cứu</h1>
+                <p class="text-slate-500 mt-0.5 text-xs md:text-sm">Mô hình minh bạch hoá chi phí và lợi nhuận cho bài báo khoa học phân khúc Q1</p>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-right shrink-0">
+                <p class="text-[10px] text-slate-400 uppercase font-bold">Tác giả sáng lập (Setup / First Author)</p>
+                <p class="text-lg font-bold text-slate-800">Vy Đặng</p>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT: 2-COLUMN STRUCTURE -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- CỘT BÊN TRÁI (5/12 PHẦN): PHÂN KHU THÔNG SỐ ĐẦU VÀO -->
+            <div class="lg:col-span-5 space-y-6 bg-slate-200/50 p-6 rounded-2xl border border-slate-300/40 shadow-sm">
+                
+                <div class="flex items-center justify-between pb-3 border-b border-slate-300/60">
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                        <i class="fa-solid fa-gears text-slate-600"></i>
+                        Vùng Thông Số Đầu Vào
+                    </span>
+                </div>
+
+                <!-- Card 1: Các chi phí & Nguồn thu -->
+                <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
+                    <h2 class="text-xs font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-chula-pink"></i>
+                        Thông số tài chính
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Input Phí xuất bản -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Chi phí xuất bản dự kiến (APC)</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="text" v-model="apcCostFormatted" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-chula-pink" placeholder="30.000.000">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-slate-400 font-bold text-xs">VND</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Input Nguồn Thu -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Tổng nguồn thu nhận được</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="text" 
+                                       v-model="revenueFormatted" 
+                                       :disabled="scenario === '1'"
+                                       :class="scenario === '1' ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-slate-50 text-emerald-600 border-slate-200 focus:ring-emerald-500'"
+                                       class="w-full border rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2" 
+                                       placeholder="60.000.000">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span :class="scenario === '1' ? 'text-slate-400' : 'text-emerald-500'" class="font-bold text-xs">VND</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selector chọn Người nhận tiền từ ngoài Chula -->
+                        <div class="pt-3 border-t border-slate-100">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Thành viên nộp nhận thưởng từ trường họ (Nhận 30% Net)</label>
+                            <select v-model="externalRecipient" 
+                                    :disabled="scenario !== '2.2'"
+                                    :class="scenario !== '2.2' ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-slate-50 text-slate-800 border-slate-200 focus:ring-chula-pink'"
+                                    class="w-full border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:ring-2">
+                                <option value="">-- Để trống / Chưa chọn --</option>
+                                <option value="XuanHong">Hồng Nguyễn</option>
+                                <option value="LaThanh">Thanh La</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: PHẦN GỘP - Biểu đồ & Tỉ lệ Đóng góp cống hiến -->
+                <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
+                    <div class="flex items-center justify-between mb-1">
+                        <h2 class="text-xs font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-chula-pink"></i>
+                            Tỉ lệ đóng góp cống hiến bài viết
+                        </h2>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mb-4">Các tỉ lệ cống hiến viết bài của các thành viên được quy đổi cố định</p>
+                    
+                    <!-- Grid hiển thị ghép đôi: Trái là Pie, Phải là danh sách tên -->
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                        <!-- Biểu đồ hình tròn -->
+                        <div class="sm:col-span-5 flex flex-col items-center justify-center bg-slate-50 p-2 rounded-xl border border-slate-100 h-[140px]">
+                            <div class="w-full max-w-[100px] h-[100px] relative">
+                                <canvas id="contributionPieChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Danh sách thành viên -->
+                        <div class="sm:col-span-7 space-y-2">
+                            <!-- Vy Đặng -->
+                            <div class="bg-slate-50 p-2.5 rounded-xl border-l-4 border-chula-pink flex justify-between items-center text-[11px]">
+                                <div>
+                                    <span class="font-bold text-slate-800 block">Vy Đặng (Bạn)</span>
+                                    <span class="text-[9px] text-slate-400 block mt-0.5">Ý tưởng & Viết chính (First)</span>
+                                </div>
+                                <span class="text-xs font-black text-chula-pink bg-chula-light px-2 py-0.5 rounded">46%</span>
+                            </div>
+
+                            <!-- Hồng Nguyễn -->
+                            <div class="bg-slate-50 p-2.5 rounded-xl border-l-4 border-blue-500 flex justify-between items-center text-[11px]">
+                                <div>
+                                    <span class="font-bold text-slate-800 block">Hồng Nguyễn</span>
+                                    <span class="text-[9px] text-slate-400 block mt-0.5">Hỗ trợ viết (Co-author)</span>
+                                </div>
+                                <span class="text-xs font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded">35.5%</span>
+                            </div>
+
+                            <!-- Thanh La -->
+                            <div class="bg-slate-50 p-2.5 rounded-xl border-l-4 border-emerald-500 flex justify-between items-center text-[11px]">
+                                <div>
+                                    <span class="font-bold text-slate-800 block">Thanh La</span>
+                                    <span class="text-[9px] text-slate-400 block mt-0.5">Hỗ trợ viết (Co-author)</span>
+                                </div>
+                                <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">18.5%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CỘT BÊN PHẢI (7/12 PHẦN): PHÂN KHU KỊCH BẢN & MÔ PHỎNG DÒNG TIỀN -->
+            <div class="lg:col-span-7 space-y-6 bg-slate-200/50 p-6 rounded-2xl border border-slate-300/40 shadow-sm">
+                
+                <div class="flex items-center justify-between pb-3 border-b border-slate-300/60">
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                        <i class="fa-solid fa-square-poll-vertical text-slate-600"></i>
+                        Kịch Bản & Kết Quả Tính Toán
+                    </span>
+                    <span class="bg-chula-pink/10 text-chula-pink text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Mô phỏng</span>
+                </div>
+
+                <!-- BỘ CHỌN KỊCH BẢN - DẠNG TAB NGANG (SEGMENTED CONTROL) -->
+                <div class="bg-slate-200/80 p-1.5 rounded-2xl flex flex-col sm:flex-row gap-1 border border-slate-300/40 shadow-sm">
+                    <!-- TH 1 -->
+                    <button @click="scenario = '1'" 
+                            :class="scenario === '1' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'" 
+                            class="flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-minus" :class="scenario === '1' ? 'text-rose-500' : 'text-slate-400'"></i>
+                        <span>Kịch bản 1: Không nguồn thu</span>
+                    </button>
+
+                    <!-- TH 2.1 -->
+                    <button @click="scenario = '2.1'" 
+                            :class="scenario === '2.1' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'" 
+                            class="flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-dollar-to-slot" :class="scenario === '2.1' ? 'text-chula-pink' : 'text-slate-400'"></i>
+                        <span>Kịch bản 2.1: Quỹ Chula</span>
+                    </button>
+
+                    <!-- TH 2.2 -->
+                    <button @click="scenario = '2.2'" 
+                            :class="scenario === '2.2' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'" 
+                            class="flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-sack-dollar" :class="scenario === '2.2' ? 'text-emerald-500' : 'text-slate-400'"></i>
+                        <span>Kịch bản 2.2: Nguồn ngoài Chula</span>
+                    </button>
+                </div>
+
+                <!-- KHỐI DASHBOARD LIỀN MẠCH: MÔ PHỎNG DÒNG TIỀN + CHI TIẾT SỐ LIỆU -->
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+                    
+                    <!-- PHẦN ĐẦU: TRỰC QUAN HÓA & MÔ PHỎNG -->
+                    <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                        <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-chula-pink"></i>
+                            Mô phỏng đồ thị phân bổ & Dòng tiền thực tế
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase block">Dòng chảy phân bổ tài chính (Net Revenue Flow)</span>
+                            
+                            <!-- Thanh dòng chảy tiến trình -->
+                            <div class="relative bg-slate-200 h-10 rounded-xl overflow-hidden flex text-[10px] font-bold text-white shadow-inner border border-slate-300/30">
+                                <div v-if="scenario !== '1' && netRevenue > 0" class="bg-slate-700 flex items-center justify-center transition-all duration-500" :style="{ width: percentApc + '%' }">
+                                    <span v-if="percentApc > 15">APC ({{ percentApc }}%)</span>
+                                </div>
+                                <div v-if="scenario === '2.1' && netRevenue > 0" class="bg-purple-600 flex items-center justify-center transition-all duration-500" :style="{ width: percentProf + '%' }">
+                                    <span v-if="percentProf > 15">GS ({{ percentProf }}%)</span>
+                                </div>
+                                <div v-if="scenario === '2.2' && netRevenue > 0 && externalRecipient" class="bg-orange-600 flex items-center justify-center transition-all duration-500" :style="{ width: percentExternalRec + '%' }">
+                                    <span v-if="percentExternalRec > 15">Nguồn ({{ percentExternalRec }}%)</span>
+                                </div>
+                                <div v-if="scenario !== '1' && netRevenue > 0" class="bg-chula-pink flex items-center justify-center transition-all duration-500" :style="{ width: percentSetup + '%' }">
+                                    <span v-if="percentSetup > 15">Setup ({{ percentSetup }}%)</span>
+                                </div>
+                                <div v-if="scenario !== '1' && netRevenue > 0" class="bg-indigo-600 flex items-center justify-center transition-all duration-500" :style="{ width: percentRemaining + '%' }">
+                                    <span v-if="percentRemaining > 15">Viết ({{ percentRemaining }}%)</span>
+                                </div>
+                                <div v-if="scenario === '1' || netRevenue <= 0" class="bg-rose-500 w-full flex items-center justify-center">
+                                    <span class="text-[11px] font-extrabold">Tự gánh chi phí xuất bản âm (100% chi phí tự bỏ tiền túi)</span>
+                                </div>
+                            </div>
+
+                            <!-- Chú thích ký hiệu màu sắc -->
+                            <div class="grid grid-cols-2 gap-x-2 gap-y-2 text-[10px] text-slate-500 pt-1">
+                                <div v-if="scenario !== '1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-slate-700 rounded-sm"></span> Hoàn vốn APC</div>
+                                <div v-if="scenario === '2.1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-purple-600 rounded-sm"></span> Giáo Sư (20% Net)</div>
+                                <div v-if="scenario === '2.2' && externalRecipient" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-orange-600 rounded-sm"></span> Kết nối nguồn (30% Net)</div>
+                                <div v-if="scenario !== '1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-chula-pink rounded-sm"></span> Setup Vy Đặng (20% Net)</div>
+                                <div v-if="scenario !== '1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-indigo-600 rounded-sm"></span> Phần Viết bài (%)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PHẦN THÂN: BẢNG CHI TIẾT SỐ TIỀN THỰC NHẬN -->
+                    <div class="overflow-x-auto">
+                        <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Số liệu chi tiết phân bổ dòng tiền</span>
+                            <span class="text-[10px] font-bold bg-chula-dark/50 text-chula-pink px-2.5 py-0.5 rounded-full border border-chula-pink/30">
+                                {{ scenarioTitle }}
+                            </span>
+                        </div>
+                        
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold border-b border-slate-200">
+                                    <th class="p-4 pl-5">Thành viên</th>
+                                    <th class="p-4">Cơ chế áp dụng</th>
+                                    <th class="p-4 text-right">Phần trăm thực tế</th>
+                                    <th class="p-4 text-right pr-5">Thực nhận / Gánh chi phí</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-xs">
+                                <!-- Vy Đặng -->
+                                <tr class="hover:bg-slate-50/70 transition-colors">
+                                    <td class="p-4 pl-5 flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-full bg-chula-light text-chula-pink flex items-center justify-center font-bold text-xs shrink-0">Vy</div>
+                                        <div>
+                                            <p class="font-bold text-slate-900">Vy Đặng</p>
+                                            <p class="text-[10px] text-slate-400">First Author (Bạn)</p>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ vyPercent }}%</span>
+                                        <span v-if="scenario !== '1'" class="text-[10px] font-bold bg-chula-light text-chula-pink px-2 py-0.5 rounded block w-fit">Setup dự án: +20% Net</span>
+                                    </td>
+                                    <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
+                                        {{ vyPercentBonus }}
+                                    </td>
+                                    <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="vyAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
+                                        {{ formatCurrency(vyAmount) }}
+                                    </td>
+                                </tr>
+
+                                <!-- Hồng Nguyễn -->
+                                <tr class="hover:bg-slate-50/70 transition-colors">
+                                    <td class="p-4 pl-5 flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">Hồ</div>
+                                        <div>
+                                            <p class="font-bold text-slate-900">Hồng Nguyễn</p>
+                                            <p class="text-[10px] text-slate-400">Co-author</p>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ xuanHongPercent }}%</span>
+                                        <span v-if="scenario === '2.2' && externalRecipient === 'XuanHong'" class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded block w-fit">Mang nguồn về: +30% Net</span>
+                                    </td>
+                                    <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
+                                        {{ xuanHongPercentBonus }}
+                                    </td>
+                                    <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="xuanHongAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
+                                        {{ formatCurrency(xuanHongAmount) }}
+                                    </td>
+                                </tr>
+
+                                <!-- Thanh La -->
+                                <tr class="hover:bg-slate-50/70 transition-colors">
+                                    <td class="p-4 pl-5 flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">Th</div>
+                                        <div>
+                                            <p class="font-bold text-slate-900">Thanh La</p>
+                                            <p class="text-[10px] text-slate-400">Co-author</p>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ laThanhPercent }}%</span>
+                                        <span v-if="scenario === '2.2' && externalRecipient === 'LaThanh'" class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded block w-fit">Mang nguồn về: +30% Net</span>
+                                    </td>
+                                    <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
+                                        {{ laThanhPercentBonus }}
+                                    </td>
+                                    <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="laThanhAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
+                                        {{ formatCurrency(laThanhAmount) }}
+                                    </td>
+                                </tr>
+
+                                <!-- Giáo Sư -->
+                                <tr class="bg-slate-50 font-medium" v-if="scenario === '2.1'">
+                                    <td class="p-4 pl-5 flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs shrink-0">GS</div>
+                                        <div>
+                                            <p class="font-bold text-slate-900">Giáo sư hướng dẫn</p>
+                                            <p class="text-[10px] text-slate-400">Corresponding Author</p>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded block w-fit">Tri ân bảo chứng: 20% Net</span>
+                                    </td>
+                                    <td class="p-4 text-right font-mono font-bold text-purple-700 text-[11px]">20% Net</td>
+                                    <td class="p-4 text-right font-mono font-extrabold text-purple-700 text-xs pr-5">
+                                        {{ formatCurrency(profAmount) }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER & EXPLANATION OF CONCEPTS -->
+        <footer class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 mt-8">
+            <h4 class="text-slate-900 font-bold text-sm mb-3">Lưu ý:</h4>
+            <ul class="text-[11px] text-slate-500 space-y-2 list-disc pl-5">
+                <li><strong>Phí Setup (20%):</strong> Công sức Vy Đặng lên ý tưởng ban đầu, đọc tài liệu lập kết cấu, sử dụng uy tín cá nhân ngoại giao liên kết với Giáo sư và chịu trách nhiệm cao nhất về pháp lý khoa học với trường Chula.</li>
+                <li><strong>Trích thưởng nguồn ngoài (Trường hợp 2.2):</strong> Khi thành viên nào mang được quỹ hỗ trợ thưởng từ chính trường họ về đóng góp cho quỹ chung, họ xứng đáng nhận riêng 30% để bù đắp nỗ lực làm thủ tục hành chính tại đơn vị của họ.</li>
+                <li><strong>Trường hợp không có doanh thu:</strong> Nếu không xin được hỗ trợ và không có thưởng thưởng dự kiến, các thành viên cam kết sẽ <strong>tự gánh chi phí xuất bản âm (100% chi phí tự bỏ tiền túi)</strong> dựa trên đúng tỉ lệ cống hiến viết bài.</li>
+                <li><strong>Chi phí APC:</strong> Luôn luôn được ưu tiên hoàn trả hoặc thanh toán trước để đảm bảo tính an toàn tài chính cho toàn nhóm.</li>
+            </ul>
+        </footer>
+
+        <!-- WORKLOAD BREAKDOWN SECTION (Interactive Table reconstruction from Workload.jpg) -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 mt-8 overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h4 class="text-slate-900 font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-table-list text-chula-pink"></i>
+                    Bảng Phân Rã Khối Lượng Công Việc Thực Tế (Workload Breakdown)
+                </h4>
+                <span class="text-[10px] font-bold text-chula-pink bg-chula-light px-2 py-1 rounded-full uppercase tracking-wider">Khớp 100% Số liệu</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-4">
+                Dưới đây là bảng phân rã chi tiết toàn bộ các đầu việc trải dài qua 6 giai đoạn (Phase) nghiên cứu. Bảng này hiển thị trực quan và sắc nét 100% thông tin gốc từ tài liệu gốc, tạo nền tảng khoa học vững chắc lý giải cho tỷ lệ cống hiến <strong>46% - 35.5% - 18.5%</strong> của nhóm:
+            </p>
+            
+            <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-orange-500 text-white font-bold text-center border-b border-orange-600">
+                            <th class="p-2.5 text-left border-r border-orange-600/30 w-16">Task ID</th>
+                            <th class="p-2.5 text-left border-r border-orange-600/30 w-24">Phase</th>
+                            <th class="p-2.5 text-left border-r border-orange-600/30">Task Name</th>
+                            <th class="p-2.5 border-r border-orange-600/30 w-24">Vy Dang</th>
+                            <th class="p-2.5 border-r border-orange-600/30 w-24">Hong Nguyen</th>
+                            <th class="p-2.5 w-24">Thanh La</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <!-- Phase 1 -->
+                        <tr class="bg-orange-50/60 font-bold text-slate-900">
+                            <td class="p-2 border-r border-slate-200 text-center">1</td>
+                            <td class="p-2 border-r border-slate-200">Phase 1</td>
+                            <td colspan="4" class="p-2">Planning</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">1.1</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Planning</td>
+                            <td class="p-2 border-r border-slate-200">Finalize Research Question (PICO)</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">1.2</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Planning</td>
+                            <td class="p-2 border-r border-slate-200">Develop Protocol</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">1.3</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Planning</td>
+                            <td class="p-2 border-r border-slate-200">Internal Protocol Review</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">1.4</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Planning</td>
+                            <td class="p-2 border-r border-slate-200">Register Protocol (e.g., PROSPERO)</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+
+                        <!-- Phase 2 -->
+                        <tr class="bg-orange-50/60 font-bold text-slate-900">
+                            <td class="p-2 border-r border-slate-200 text-center">2</td>
+                            <td class="p-2 border-r border-slate-200">Phase 2</td>
+                            <td colspan="4" class="p-2">Searching</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">2.1</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Searching</td>
+                            <td class="p-2 border-r border-slate-200">Identify Databases & Finalize Keywords</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">2.2</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Searching</td>
+                            <td class="p-2 border-r border-slate-200">Develop Full Search String</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">2.3</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Searching</td>
+                            <td class="p-2 border-r border-slate-200">Peer-Review Search String (PRESS)</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">2.4</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Searching</td>
+                            <td class="p-2 border-r border-slate-200">Run Search in All Databases</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">0.6</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">2.5</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Searching</td>
+                            <td class="p-2 border-r border-slate-200">Rayyan to exclude duplicated</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">0.5</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">2.6</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Searching</td>
+                            <td class="p-2 border-r border-slate-200">Export All Results & Deduplicate</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+
+                        <!-- Phase 3 -->
+                        <tr class="bg-orange-50/60 font-bold text-slate-900">
+                            <td class="p-2 border-r border-slate-200 text-center">3</td>
+                            <td class="p-2 border-r border-slate-200">Phase 3</td>
+                            <td colspan="4" class="p-2">Screening</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.1</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Set Up Screening Tool (e.g., Rayyan)</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.2</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Pilot Screening (50-100 abstracts)</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">0.5</td>
+                            <td class="p-2 text-center font-bold text-slate-800">0.5</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.3</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Level 1 (Title/Abstract) - R1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.4</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Level 1 (Title/Abstract) - R2</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.5</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Level 1 Conflict Resolution</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.6</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Retrieve All Full Texts</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">0.6</td>
+                            <td class="p-2 text-center font-bold text-slate-800">0.3</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.7</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Level 2 (Full Text) - R1</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.8</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Level 2 (Full Text) - R2</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">3.9</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Screening</td>
+                            <td class="p-2 border-r border-slate-200">Level 2 Conflict Resolution</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+
+                        <!-- Phase 4 -->
+                        <tr class="bg-orange-50/60 font-bold text-slate-900">
+                            <td class="p-2 border-r border-slate-200 text-center">4</td>
+                            <td class="p-2 border-r border-slate-200">Phase 4</td>
+                            <td colspan="4" class="p-2">Extraction & QA</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.1</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Extraction</td>
+                            <td class="p-2 border-r border-slate-200">Develop Data Extraction Form</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.2</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Extraction</td>
+                            <td class="p-2 border-r border-slate-200">Pilot Extraction Form</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.3</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Extraction</td>
+                            <td class="p-2 border-r border-slate-200">Data Extraction (R1)</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">0.5</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.4</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Extraction</td>
+                            <td class="p-2 border-r border-slate-200">Data Extraction (R2)</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">3</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">3</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.5</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Extraction</td>
+                            <td class="p-2 border-r border-slate-200">Data Extraction Check (R3)</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">2</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.6</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">QA</td>
+                            <td class="p-2 border-r border-slate-200">Select Quality Assessment Tool</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.7</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">QA</td>
+                            <td class="p-2 border-r border-slate-200">Quality Assessment (R1)</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.8</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">QA</td>
+                            <td class="p-2 border-r border-slate-200">Quality Assessment (R2)</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center font-bold text-slate-800">1</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">4.9</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">QA</td>
+                            <td class="p-2 border-r border-slate-200">QA Conflict Resolution</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+
+                        <!-- Phase 5 -->
+                        <tr class="bg-orange-50/60 font-bold text-slate-900">
+                            <td class="p-2 border-r border-slate-200 text-center">5</td>
+                            <td class="p-2 border-r border-slate-200">Phase 5</td>
+                            <td colspan="4" class="p-2">Writing</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">5.1</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Writing</td>
+                            <td class="p-2 border-r border-slate-200">Perform Synthesis / Meta-analysis</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">5.2</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Writing</td>
+                            <td class="p-2 border-r border-slate-200">Create PRISMA Flow Diagram</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">5.3</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Writing</td>
+                            <td class="p-2 border-r border-slate-200">Draft: Introduction</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">5.4</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Writing</td>
+                            <td class="p-2 border-r border-slate-200">Draft: Methods</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 text-center font-bold text-slate-800">0.3</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">5.5</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Writing</td>
+                            <td class="p-2 border-r border-slate-200">Draft: Results (Q1,2,3)</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">2</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">5.6</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Writing</td>
+                            <td class="p-2 border-r border-slate-200">Draft: Discussion</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">5.7</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Writing</td>
+                            <td class="p-2 border-r border-slate-200">Draft: Conclusion & Abstract</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">5.8</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Writing</td>
+                            <td class="p-2 border-r border-slate-200">Compile References & Appendices</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">0.3</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+
+                        <!-- Phase 6 -->
+                        <tr class="bg-orange-50/60 font-bold text-slate-900">
+                            <td class="p-2 border-r border-slate-200 text-center">6</td>
+                            <td class="p-2 border-r border-slate-200">Phase 6</td>
+                            <td colspan="4" class="p-2">Review</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">6.1</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Review</td>
+                            <td class="p-2 border-r border-slate-200">First Full Draft Review</td>
+                            <td class="p-2 border-r border-slate-200 text-center font-bold text-slate-800">1</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">6.2</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Review</td>
+                            <td class="p-2 border-r border-slate-200">Consolidate Revisions</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">6.3</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Review</td>
+                            <td class="p-2 border-r border-slate-200">Final Proofread</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">6.4</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Review</td>
+                            <td class="p-2 border-r border-slate-200">Format for Target Journal</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-400">6.5</td>
+                            <td class="p-2 border-r border-slate-200 text-slate-500">Review</td>
+                            <td class="p-2 border-r border-slate-200">Submit Manuscript</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 border-r border-slate-200 text-center text-slate-300">-</td>
+                            <td class="p-2 text-center text-slate-300">-</td>
+                        </tr>
+
+                        <!-- Total Row -->
+                        <tr class="bg-orange-100 font-extrabold text-slate-900 border-t-2 border-orange-500">
+                            <td colspan="3" class="p-3 text-right border-r border-slate-200">TỔNG ĐIỂM (CÔNG SỨC / TỶ LỆ %)</td>
+                            <td class="p-3 border-r border-slate-200 text-center text-orange-600 bg-orange-50/80">
+                                <span class="block">29</span>
+                                <span class="text-[10px] text-slate-500 font-bold">46%</span>
+                            </td>
+                            <td class="p-3 border-r border-slate-200 text-center text-orange-600 bg-orange-50/80">
+                                <span class="block">22.4</span>
+                                <span class="text-[10px] text-slate-500 font-bold">35.5%</span>
+                            </td>
+                            <td class="p-3 text-center text-orange-600 bg-orange-50/80">
+                                <span class="block">11.7</span>
+                                <span class="text-[10px] text-slate-500 font-bold">18.5%</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Vue App Logic -->
+    <script>
+        const { createApp, markRaw } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    scenario: '2.1', // Default scenario
+                    apcCost: 30000000, // Chi phí xuất bản mặc định 30tr
+                    revenue: 60000000, // Doanh thu mặc định 60tr
+                    externalRecipient: '', // Default to blank / empty as requested
+                    
+                    // Fixed percentages as requested
+                    vyPercent: 46,
+                    xuanHongPercent: 35.5,
+                    laThanhPercent: 18.5,
+                    
+                    // ChartJS instance container
+                    chartInstance: null
+                };
+            },
+            computed: {
+                apcCostFormatted: {
+                    get() {
+                        return this.formatNumberWithDots(this.apcCost);
+                    },
+                    set(newValue) {
+                        this.apcCost = this.parseFormattedNumber(newValue);
+                    }
+                },
+                revenueFormatted: {
+                    get() {
+                        return this.formatNumberWithDots(this.revenue);
+                    },
+                    set(newValue) {
+                        this.revenue = this.parseFormattedNumber(newValue);
+                    }
+                },
+                scenarioTitle() {
+                    if (this.scenario === '1') return 'Trường hợp 1: Không có nguồn thu';
+                    if (this.scenario === '2.1') return 'Trường hợp 2.1: Thu từ Chula (GS 20%)';
+                    if (this.scenario === '2.2') return 'Trường hợp 2.2: Thu từ trường ngoài';
+                    return '';
+                },
+                netRevenue() {
+                    return this.revenue - this.apcCost;
+                },
+                
+                // Percentages for the Progress Bar
+                percentApc() {
+                    if (this.revenue <= 0) return 0;
+                    return Math.min(100, Math.round((this.apcCost / this.revenue) * 100));
+                },
+                percentProf() {
+                    if (this.scenario !== '2.1' || this.netRevenue <= 0) return 0;
+                    return Math.round(( (this.netRevenue * 0.2) / this.revenue ) * 100);
+                },
+                percentExternalRec() {
+                    if (this.scenario !== '2.2' || this.netRevenue <= 0 || !this.externalRecipient) return 0;
+                    return Math.round(( (this.netRevenue * 0.3) / this.revenue ) * 100);
+                },
+                percentSetup() {
+                    if (this.scenario === '1' || this.netRevenue <= 0) return 0;
+                    return Math.round(( (this.netRevenue * 0.2) / this.revenue ) * 100); // Updated: 20% setup share
+                },
+                percentRemaining() {
+                    if (this.scenario === '1' || this.netRevenue <= 0) return 0;
+                    if (this.scenario === '2.1') {
+                        return Math.round(( (this.netRevenue * 0.6) / this.revenue ) * 100); // 20% setup + 20% advisor = 40% deducted, remaining 60%
+                    }
+                    if (this.scenario === '2.2') {
+                        const hasExternal = this.externalRecipient ? 0.3 : 0;
+                        return Math.round(( (this.netRevenue * (0.8 - hasExternal)) / this.revenue ) * 100); // 20% setup + 30% external = 50% remaining (if has external)
+                    }
+                    return 0;
+                },
+                
+                // Calculates final earnings/losses based on custom percentages
+                vyAmount() {
+                    const vyFactor = this.vyPercent / 100;
+                    if (this.scenario === '1') {
+                        return -this.apcCost * vyFactor;
+                    }
+                    if (this.netRevenue <= 0) {
+                        return this.netRevenue * vyFactor;
+                    }
+                    let setupShare = this.netRevenue * 0.2; // Updated Setup share to 20%
+                    let writingShareRatio = 0.6; // Scenario 2.1: remaining 60%
+                    if (this.scenario === '2.2') {
+                        writingShareRatio = this.externalRecipient ? 0.5 : 0.8; // Scenario 2.2: 50% if external recipient selected, otherwise 80%
+                    }
+                    let remainingShare = (this.netRevenue * writingShareRatio) * vyFactor;
+                    return setupShare + remainingShare;
+                },
+                xuanHongAmount() {
+                    const xhFactor = this.xuanHongPercent / 100;
+                    if (this.scenario === '1') {
+                        return -this.apcCost * xhFactor;
+                    }
+                    if (this.netRevenue <= 0) {
+                        return this.netRevenue * xhFactor;
+                    }
+                    let externalShare = (this.scenario === '2.2' && this.externalRecipient === 'XuanHong') ? this.netRevenue * 0.3 : 0;
+                    let writingShareRatio = 0.6;
+                    if (this.scenario === '2.2') {
+                        writingShareRatio = this.externalRecipient ? 0.5 : 0.8;
+                    }
+                    let remainingShare = (this.netRevenue * writingShareRatio) * xhFactor;
+                    return externalShare + remainingShare;
+                },
+                laThanhAmount() {
+                    const ltFactor = this.laThanhPercent / 100;
+                    if (this.scenario === '1') {
+                        return -this.apcCost * ltFactor;
+                    }
+                    if (this.netRevenue <= 0) {
+                        return this.netRevenue * ltFactor;
+                    }
+                    let externalShare = (this.scenario === '2.2' && this.externalRecipient === 'LaThanh') ? this.netRevenue * 0.3 : 0;
+                    let writingShareRatio = 0.6;
+                    if (this.scenario === '2.2') {
+                        writingShareRatio = this.externalRecipient ? 0.5 : 0.8;
+                    }
+                    let remainingShare = (this.netRevenue * writingShareRatio) * ltFactor;
+                    return externalShare + remainingShare;
+                },
+                profAmount() {
+                    if (this.scenario !== '2.1' || this.netRevenue <= 0) return 0;
+                    return this.netRevenue * 0.2;
+                },
+
+                // Display dynamic text strings for percentages in table
+                vyPercentBonus() {
+                    if (this.scenario === '1') return `Gánh ${this.vyPercent}%`;
+                    if (this.scenario === '2.1') {
+                        const calcTotal = (20 + (60 * (this.vyPercent / 100))).toFixed(1);
+                        return `20% Setup + ${(60 * (this.vyPercent/100)).toFixed(1)}% Viết (Tổng ${calcTotal}% Net)`;
+                    }
+                    if (this.scenario === '2.2') {
+                        const writingRatio = this.externalRecipient ? 50 : 80;
+                        const calcTotal = (20 + (writingRatio * (this.vyPercent / 100))).toFixed(1);
+                        return `20% Setup + ${(writingRatio * (this.vyPercent/100)).toFixed(1)}% Viết (Tổng ${calcTotal}% Net)`;
+                    }
+                    return '';
+                },
+                xuanHongPercentBonus() {
+                    if (this.scenario === '1') return `Gánh ${this.xuanHongPercent}%`;
+                    if (this.scenario === '2.1') {
+                        return `${(60 * (this.xuanHongPercent / 100)).toFixed(1)}% Net`;
+                    }
+                    if (this.scenario === '2.2') {
+                        const writingRatio = this.externalRecipient ? 50 : 80;
+                        const share = (writingRatio * (this.xuanHongPercent / 100)).toFixed(1);
+                        if (this.externalRecipient === 'XuanHong') {
+                            const total = (30 + parseFloat(share)).toFixed(1);
+                            return `30% Nguồn + ${share}% Viết (Tổng ${total}% Net)`;
+                        }
+                        return `${share}% Net`;
+                    }
+                    return '';
+                },
+                laThanhPercentBonus() {
+                    if (this.scenario === '1') return `Gánh ${this.laThanhPercent}%`;
+                    if (this.scenario === '2.1') {
+                        return `${(60 * (this.laThanhPercent / 100)).toFixed(1)}% Net`;
+                    }
+                    if (this.scenario === '2.2') {
+                        const writingRatio = this.externalRecipient ? 50 : 80;
+                        const share = (writingRatio * (this.laThanhPercent / 100)).toFixed(1);
+                        if (this.externalRecipient === 'LaThanh') {
+                            const total = (30 + parseFloat(share)).toFixed(1);
+                            return `30% Nguồn + ${share}% Viết (Tổng ${total}% Net)`;
+                        }
+                        return `${share}% Net`;
+                    }
+                    return '';
+                }
+            },
+            watch: {
+                scenario(newVal) {
+                    if (newVal === '1') {
+                        this.revenue = 0;
+                    } else if (this.revenue === 0) {
+                        this.revenue = 60000000;
+                    }
+                    this.externalRecipient = '';
+                }
+            },
+            methods: {
+                formatCurrency(val) {
+                    if (!val) val = 0;
+                    const formatted = Math.round(val).toLocaleString('vi-VN');
+                    return val >= 0 ? `+${formatted} VND` : `${formatted} VND`;
+                },
+                
+                // Helper to format raw numbers to strings with dots
+                formatNumberWithDots(val) {
+                    if (val === undefined || val === null || isNaN(val)) return '0';
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                },
+                
+                // Helper to parse strings back to raw numbers
+                parseFormattedNumber(val) {
+                    if (!val) return 0;
+                    const clean = val.replace(/\./g, '').replace(/[^0-9]/g, '');
+                    return clean ? parseInt(clean, 10) : 0;
+                },
+                
+                // Initialize ChartJS Pie representation with static fixed values
+                initPieChart() {
+                    const ctx = document.getElementById('contributionPieChart').getContext('2d');
+                    this.chartInstance = markRaw(new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Vy Đặng', 'Hồng Nguyễn', 'Thanh La'],
+                            datasets: [{
+                                data: [this.vyPercent, this.xuanHongPercent, this.laThanhPercent],
+                                backgroundColor: [
+                                    '#E31C79', // Chula Pink
+                                    '#3B82F6', // Blue
+                                    '#10B981'  // Emerald
+                                ],
+                                borderWidth: 1.5,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return ` ${context.label}: ${context.raw}%`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }));
+                }
+            },
+            mounted() {
+                // Initialize fixed visual chart on canvas loaded
+                this.initPieChart();
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
