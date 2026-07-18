@@ -36,6 +36,23 @@
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
+        
+        /* Tuỳ biến giao diện thanh cuộn (Scrollbar) cho các bảng tràn viền */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px; /* Độ dày của thanh cuộn ngang */
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9; /* Màu nền track */
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Màu của tay cầm thanh cuộn */
+            border-radius: 4px;
+            border: 2px solid #f1f5f9; /* Tạo viền giả để thanh cuộn mỏng hơn một chút so với track */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* Màu khi hover chuột vào */
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
@@ -98,7 +115,7 @@
                                        :disabled="scenario === '1'"
                                        :class="scenario === '1' ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-slate-50 text-emerald-600 border-slate-200 focus:ring-emerald-500'"
                                        class="w-full border rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2" 
-                                       placeholder="60.000.000">
+                                       placeholder="200.000.000">
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <span :class="scenario === '1' ? 'text-slate-400' : 'text-emerald-500'" class="font-bold text-xs">VND</span>
                                 </div>
@@ -258,106 +275,110 @@
                     </div>
 
                     <!-- PHẦN THÂN: BẢNG CHI TIẾT SỐ TIỀN THỰC NHẬN -->
-                    <div class="overflow-x-auto">
-                        <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Số liệu chi tiết phân bổ dòng tiền</span>
-                            <span class="text-[10px] font-bold bg-chula-dark/50 text-chula-pink px-2.5 py-0.5 rounded-full border border-chula-pink/30">
-                                {{ scenarioTitle }}
-                            </span>
+                    
+                    <div class="overflow-x-auto custom-scrollbar pb-2">
+                        <!-- Ensure a minimum width to table content so it triggers scroll on small screens -->
+                        <div class="min-w-[600px]">
+                            <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+                                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Số liệu chi tiết phân bổ dòng tiền</span>
+                                <span class="text-[10px] font-bold bg-chula-dark/50 text-chula-pink px-2.5 py-0.5 rounded-full border border-chula-pink/30">
+                                    {{ scenarioTitle }}
+                                </span>
+                            </div>
+                            
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold border-b border-slate-200">
+                                        <th class="p-4 pl-5">Thành viên</th>
+                                        <th class="p-4">Cơ chế áp dụng</th>
+                                        <th class="p-4 text-right">Phần trăm thực tế</th>
+                                        <th class="p-4 text-right pr-5">Thực nhận / Gánh chi phí</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-xs">
+                                    <!-- Vy Đặng -->
+                                    <tr class="hover:bg-slate-50/70 transition-colors">
+                                        <td class="p-4 pl-5 flex items-center gap-2">
+                                            <div class="w-7 h-7 rounded-full bg-chula-light text-chula-pink flex items-center justify-center font-bold text-xs shrink-0">Vy</div>
+                                            <div>
+                                                <p class="font-bold text-slate-900">Vy Đặng</p>
+                                                <p class="text-[10px] text-slate-400">First Author (Bạn)</p>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">
+                                            <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ vyPercent }}%</span>
+                                            <span v-if="scenario !== '1'" class="text-[10px] font-bold bg-chula-light text-chula-pink px-2 py-0.5 rounded block w-fit">Setup dự án: +20% Net</span>
+                                        </td>
+                                        <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
+                                            {{ vyPercentBonus }}
+                                        </td>
+                                        <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="vyAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
+                                            {{ formatCurrency(vyAmount) }}
+                                        </td>
+                                    </tr>
+
+                                    <!-- Hồng Nguyễn -->
+                                    <tr class="hover:bg-slate-50/70 transition-colors">
+                                        <td class="p-4 pl-5 flex items-center gap-2">
+                                            <div class="w-7 h-7 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">Hồ</div>
+                                            <div>
+                                                <p class="font-bold text-slate-900">Hồng Nguyễn</p>
+                                                <p class="text-[10px] text-slate-400">Co-author</p>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">
+                                            <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ xuanHongPercent }}%</span>
+                                            <span v-if="scenario === '2.2' && externalRecipient === 'XuanHong'" class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded block w-fit">Mang nguồn về: +30% Net</span>
+                                        </td>
+                                        <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
+                                            {{ xuanHongPercentBonus }}
+                                        </td>
+                                        <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="xuanHongAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
+                                            {{ formatCurrency(xuanHongAmount) }}
+                                        </td>
+                                    </tr>
+
+                                    <!-- Thanh La -->
+                                    <tr class="hover:bg-slate-50/70 transition-colors">
+                                        <td class="p-4 pl-5 flex items-center gap-2">
+                                            <div class="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">Th</div>
+                                            <div>
+                                                <p class="font-bold text-slate-900">Thanh La</p>
+                                                <p class="text-[10px] text-slate-400">Co-author</p>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">
+                                            <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ laThanhPercent }}%</span>
+                                            <span v-if="scenario === '2.2' && externalRecipient === 'LaThanh'" class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded block w-fit">Mang nguồn về: +30% Net</span>
+                                        </td>
+                                        <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
+                                            {{ laThanhPercentBonus }}
+                                        </td>
+                                        <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="laThanhAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
+                                            {{ formatCurrency(laThanhAmount) }}
+                                        </td>
+                                    </tr>
+
+                                    <!-- Giáo Sư -->
+                                    <tr class="bg-slate-50 font-medium" v-if="scenario === '2.1'">
+                                        <td class="p-4 pl-5 flex items-center gap-2">
+                                            <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs shrink-0">GS</div>
+                                            <div>
+                                                <p class="font-bold text-slate-900">Giáo sư hướng dẫn</p>
+                                                <p class="text-[10px] text-slate-400">Corresponding Author</p>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">
+                                            <span class="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded block w-fit">Tri ân bảo chứng: 20% Net</span>
+                                        </td>
+                                        <td class="p-4 text-right font-mono font-bold text-purple-700 text-[11px]">20% Net</td>
+                                        <td class="p-4 text-right font-mono font-extrabold text-purple-700 text-xs pr-5">
+                                            {{ formatCurrency(profAmount) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold border-b border-slate-200">
-                                    <th class="p-4 pl-5">Thành viên</th>
-                                    <th class="p-4">Cơ chế áp dụng</th>
-                                    <th class="p-4 text-right">Phần trăm thực tế</th>
-                                    <th class="p-4 text-right pr-5">Thực nhận / Gánh chi phí</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 text-xs">
-                                <!-- Vy Đặng -->
-                                <tr class="hover:bg-slate-50/70 transition-colors">
-                                    <td class="p-4 pl-5 flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-full bg-chula-light text-chula-pink flex items-center justify-center font-bold text-xs shrink-0">Vy</div>
-                                        <div>
-                                            <p class="font-bold text-slate-900">Vy Đặng</p>
-                                            <p class="text-[10px] text-slate-400">First Author (Bạn)</p>
-                                        </div>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ vyPercent }}%</span>
-                                        <span v-if="scenario !== '1'" class="text-[10px] font-bold bg-chula-light text-chula-pink px-2 py-0.5 rounded block w-fit">Setup dự án: +20% Net</span>
-                                    </td>
-                                    <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
-                                        {{ vyPercentBonus }}
-                                    </td>
-                                    <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="vyAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
-                                        {{ formatCurrency(vyAmount) }}
-                                    </td>
-                                </tr>
-
-                                <!-- Hồng Nguyễn -->
-                                <tr class="hover:bg-slate-50/70 transition-colors">
-                                    <td class="p-4 pl-5 flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">Hồ</div>
-                                        <div>
-                                            <p class="font-bold text-slate-900">Hồng Nguyễn</p>
-                                            <p class="text-[10px] text-slate-400">Co-author</p>
-                                        </div>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ xuanHongPercent }}%</span>
-                                        <span v-if="scenario === '2.2' && externalRecipient === 'XuanHong'" class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded block w-fit">Mang nguồn về: +30% Net</span>
-                                    </td>
-                                    <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
-                                        {{ xuanHongPercentBonus }}
-                                    </td>
-                                    <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="xuanHongAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
-                                        {{ formatCurrency(xuanHongAmount) }}
-                                    </td>
-                                </tr>
-
-                                <!-- Thanh La -->
-                                <tr class="hover:bg-slate-50/70 transition-colors">
-                                    <td class="p-4 pl-5 flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">Th</div>
-                                        <div>
-                                            <p class="font-bold text-slate-900">Thanh La</p>
-                                            <p class="text-[10px] text-slate-400">Co-author</p>
-                                        </div>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded block w-fit mb-0.5">Viết bài: {{ laThanhPercent }}%</span>
-                                        <span v-if="scenario === '2.2' && externalRecipient === 'LaThanh'" class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded block w-fit">Mang nguồn về: +30% Net</span>
-                                    </td>
-                                    <td class="p-4 text-right font-mono font-bold text-slate-600 text-[11px]">
-                                        {{ laThanhPercentBonus }}
-                                    </td>
-                                    <td class="p-4 text-right font-mono font-extrabold text-xs pr-5" :class="laThanhAmount >= 0 ? 'text-emerald-600' : 'text-rose-500'">
-                                        {{ formatCurrency(laThanhAmount) }}
-                                    </td>
-                                </tr>
-
-                                <!-- Giáo Sư -->
-                                <tr class="bg-slate-50 font-medium" v-if="scenario === '2.1'">
-                                    <td class="p-4 pl-5 flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs shrink-0">GS</div>
-                                        <div>
-                                            <p class="font-bold text-slate-900">Giáo sư hướng dẫn</p>
-                                            <p class="text-[10px] text-slate-400">Corresponding Author</p>
-                                        </div>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded block w-fit">Tri ân bảo chứng: 20% Net</span>
-                                    </td>
-                                    <td class="p-4 text-right font-mono font-bold text-purple-700 text-[11px]">20% Net</td>
-                                    <td class="p-4 text-right font-mono font-extrabold text-purple-700 text-xs pr-5">
-                                        {{ formatCurrency(profAmount) }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
 
@@ -383,14 +404,15 @@
                     <i class="fa-solid fa-table-list text-chula-pink"></i>
                     Bảng Phân Rã Khối Lượng Công Việc Thực Tế (Workload Breakdown)
                 </h4>
-                <span class="text-[10px] font-bold text-chula-pink bg-chula-light px-2 py-1 rounded-full uppercase tracking-wider">Khớp 100% Số liệu</span>
             </div>
-            <p class="text-[11px] text-slate-500 mb-4">
+            <p class="text-[11px] text-slate-500 mb-2">
                 Dưới đây là bảng phân rã chi tiết toàn bộ các đầu việc trải dài qua 6 giai đoạn (Phase) nghiên cứu. Bảng này hiển thị trực quan và sắc nét 100% thông tin gốc từ tài liệu gốc, tạo nền tảng khoa học vững chắc lý giải cho tỷ lệ cống hiến <strong>46% - 35.5% - 18.5%</strong> của nhóm:
             </p>
             
-            <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
-                <table class="w-full text-left border-collapse text-xs">
+            <!-- Thêm class custom-scrollbar vào wrapper -->
+            <div class="overflow-x-auto custom-scrollbar rounded-xl border border-slate-200 shadow-sm pb-1">
+                <!-- Add min-width to ensure it always forces horizontal scroll on small viewports -->
+                <table class="w-full text-left border-collapse text-xs min-w-[700px]">
                     <thead>
                         <tr class="bg-orange-500 text-white font-bold text-center border-b border-orange-600">
                             <th class="p-2.5 text-left border-r border-orange-600/30 w-16">Task ID</th>
@@ -804,7 +826,7 @@
                 return {
                     scenario: '2.1', // Default scenario
                     apcCost: 30000000, // Chi phí xuất bản mặc định 30tr
-                    revenue: 60000000, // Doanh thu mặc định 60tr
+                    revenue: 200000000, // Doanh thu mặc định 200tr
                     externalRecipient: '', // Default to blank / empty as requested
                     
                     // Fixed percentages as requested
@@ -978,7 +1000,7 @@
                     if (newVal === '1') {
                         this.revenue = 0;
                     } else if (this.revenue === 0) {
-                        this.revenue = 60000000;
+                        this.revenue = 200000000;
                     }
                     this.externalRecipient = '';
                 }
