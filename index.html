@@ -71,11 +71,11 @@
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-right shrink-0 flex flex-col gap-2">
                 <div>
                     <p class="text-[10px] text-slate-400 uppercase font-bold">First Author</p>
-                    <p class="text-lg font-bold text-slate-800">Vy Đặng</p>
+                    <p class="text-lg font-bold text-slate-800">Vy Dang</p>
                 </div>
                 <div>
                     <p class="text-[10px] text-slate-400 uppercase font-bold">Co-authors</p>
-                    <p class="text-sm font-bold text-slate-700">Hồng Nguyễn, Thanh La</p>
+                    <p class="text-sm font-bold text-slate-700">Hong Nguyen, Thanh La</p>
                 </div>
             </div>
         </header>
@@ -136,7 +136,7 @@
                                     :class="scenario !== '2.2' ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-slate-50 text-slate-800 border-slate-200 focus:ring-chula-pink'"
                                     class="w-full border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:ring-2">
                                 <option value="">-- Để trống / Chưa chọn --</option>
-                                <option value="XuanHong">Hồng Nguyễn</option>
+                                <option value="XuanHong">Hong Nguyen</option>
                                 <option value="LaThanh">Thanh La</option>
                             </select>
                         </div>
@@ -163,19 +163,19 @@
 
                         <!-- Danh sách thành viên -->
                         <div class="sm:col-span-7 space-y-2">
-                            <!-- Vy Đặng -->
+                            <!-- Vy Dang -->
                             <div class="bg-slate-50 p-2.5 rounded-xl border-l-4 border-chula-pink flex justify-between items-center text-[11px]">
                                 <div>
-                                    <span class="font-bold text-slate-800 block">Vy Đặng (Bạn)</span>
+                                    <span class="font-bold text-slate-800 block">Vy Dang (Bạn)</span>
                                     <span class="text-[9px] text-slate-400 block mt-0.5">First Author</span>
                                 </div>
                                 <span class="text-xs font-black text-chula-pink bg-chula-light px-2 py-0.5 rounded">46%</span>
                             </div>
 
-                            <!-- Hồng Nguyễn -->
+                            <!-- Hong Nguyen -->
                             <div class="bg-slate-50 p-2.5 rounded-xl border-l-4 border-blue-500 flex justify-between items-center text-[11px]">
                                 <div>
-                                    <span class="font-bold text-slate-800 block">Hồng Nguyễn</span>
+                                    <span class="font-bold text-slate-800 block">Hong Nguyen</span>
                                     <span class="text-[9px] text-slate-400 block mt-0.5">Co-author</span>
                                 </div>
                                 <span class="text-xs font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded">35.5%</span>
@@ -277,7 +277,7 @@
                                     <span v-if="percentRemaining > 15">Viết ({{ percentRemaining }}%)</span>
                                 </div>
                                 <div v-if="scenario === '1' || netRevenue <= 0" class="bg-rose-500 w-full flex items-center justify-center">
-                                    <span class="text-[11px] font-extrabold">Tự gánh chi phí xuất bản âm (100% chi phí tự bỏ tiền túi)</span>
+                                    <span class="text-[11px] font-extrabold">Tự gánh chi phí xuất bản</span>
                                 </div>
                             </div>
 
@@ -286,7 +286,7 @@
                                 <div v-if="scenario !== '1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-slate-700 rounded-sm"></span> Hoàn vốn APC</div>
                                 <div v-if="scenario === '2.1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-purple-600 rounded-sm"></span> Giáo Sư (20% Net)</div>
                                 <div v-if="scenario === '2.2' && externalRecipient" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-orange-600 rounded-sm"></span> Kết nối nguồn (30% Net)</div>
-                                <div v-if="scenario !== '1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-chula-pink rounded-sm"></span> Setup Vy Đặng (20% Net)</div>
+                                <div v-if="scenario !== '1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-chula-pink rounded-sm"></span> Setup Vy Dang (20% Net)</div>
                                 <div v-if="scenario !== '1'" class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-indigo-600 rounded-sm"></span> Phần Viết bài (%)</div>
                             </div>
                         </div>
@@ -314,12 +314,12 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 text-xs">
-                                    <!-- Vy Đặng -->
+                                    <!-- Vy Dang -->
                                     <tr class="hover:bg-slate-50/70 transition-colors">
                                         <td class="p-4 pl-5 flex items-center gap-2">
                                             <div class="w-7 h-7 rounded-full bg-chula-light text-chula-pink flex items-center justify-center font-bold text-xs shrink-0">Vy</div>
                                             <div>
-                                                <p class="font-bold text-slate-900">Vy Đặng</p>
+                                                <p class="font-bold text-slate-900">Vy Dang</p>
                                                 <p class="text-[10px] text-slate-400">First Author (Bạn)</p>
                                             </div>
                                         </td>
@@ -335,12 +335,12 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Hồng Nguyễn -->
+                                    <!-- Hong Nguyen -->
                                     <tr class="hover:bg-slate-50/70 transition-colors">
                                         <td class="p-4 pl-5 flex items-center gap-2">
                                             <div class="w-7 h-7 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">Hồ</div>
                                             <div>
-                                                <p class="font-bold text-slate-900">Hồng Nguyễn</p>
+                                                <p class="font-bold text-slate-900">Hong Nguyen</p>
                                                 <p class="text-[10px] text-slate-400">Co-author</p>
                                             </div>
                                         </td>
@@ -413,7 +413,7 @@
                 </h4>
             </div>
             <p class="text-[11px] text-slate-500 mb-4">
-                Chi tiết các đầu việc qua 6 giai đoạn (Phases) nghiên cứu, tính tổng điểm và chia thành tỷ lệ cống hiến: <strong>Vy Đặng 46% - Hồng Nguyễn 35.5% - Thanh La 18.5%</strong>.
+                Chi tiết các đầu việc qua 6 giai đoạn (Phases) nghiên cứu, tính tổng điểm và chia thành tỷ lệ cống hiến: <strong>Vy Dang 46% - Hong Nguyen 35.5% - Thanh La 18.5%</strong>.
             </p>
             
             <!-- Thêm class custom-scrollbar vào wrapper -->
@@ -1038,7 +1038,7 @@
                     this.chartInstance = markRaw(new Chart(ctx, {
                         type: 'pie',
                         data: {
-                            labels: ['Vy Đặng', 'Hồng Nguyễn', 'Thanh La'],
+                            labels: ['Vy Dang', 'Hong Nguyen', 'Thanh La'],
                             datasets: [{
                                 data: [this.vyPercent, this.xuanHongPercent, this.laThanhPercent],
                                 backgroundColor: [
